@@ -1,11 +1,11 @@
-# go-gb28181
+# go-gb28181 分布式国标信令平台
 
-一个 golang 写的分布式 GB28181 程序 
+一个 golang 写的分布式 GB28181 信令平台
 
 # 功能特性
 -  跨平台服务，支持x86和arm,aarch64等
 -  接入设备
--  支持主码流子码流切换
+-  支持tcp,udp模式切换
 -  支持高标清流切换
 -  云台控制，控制设备转向，拉近，拉远
 -  支持摄像头语音对讲
@@ -36,7 +36,34 @@ sip-client是部署在和IPC在同一个局域网的服务，兼容各种平台�
 
 # 开始使用
 
-
+启动ZLM, 参考[ZLMediaKit](https://github.com/ZLMediaKit/ZLMediaKit)
+修改hook配置,其中ip端口为gateway服务的ip端口
+```
+[hook]
+alive_interval=10.0
+enable=1
+on_flow_report=
+on_http_access=
+on_play=http://127.0.0.1:8999/open/zlm/webhook/on_play
+on_publish=http://127.0.0.1:8999/open/zlm/webhook/on_publish
+on_record_mp4=http://127.0.0.1:8999/open/zlm/webhook/on_record_mp4
+on_record_ts=
+on_rtp_server_timeout=http://127.0.0.1:8999/open/zlm/webhook/on_rtp_server_timeout
+on_rtsp_auth=
+on_rtsp_realm=
+on_send_rtp_stopped=http://127.0.0.1:8999/open/zlm/webhook/on_send_rtp_stopped
+on_server_exited=http://127.0.0.1:8999/open/zlm/webhook/on_server_exited
+on_server_keepalive=
+on_server_started=http://127.0.0.1:8999/open/zlm/webhook/on_server_started
+on_shell_login=
+on_stream_changed=http://127.0.0.1:8999/open/zlm/webhook/on_stream_changed
+on_stream_none_reader=http://127.0.0.1:8999/open/zlm/webhook/on_stream_none_reader
+on_stream_not_found=http://127.0.0.1:8999/open/zlm/webhook/on_stream_not_found
+retry=1
+retry_delay=3.0
+stream_changed_schemas=rtsp/rtmp/fmp4/ts/hls/hls.fmp4
+timeoutSec=10
+```
 
 ## go-sip-gateway
 gateway配置
@@ -97,3 +124,4 @@ gb28181: # gb28181 域，系统id，用户id，通道id，用户数量，初次�
 cd cmd/go-sip-client
 go run cmd/go-sip-client.go
 ```
+
