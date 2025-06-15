@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package signaling;
+option go_package = "./signaling"; 
+
+service SipService {
+  // 双向流式通信通道
+  rpc StreamChannel(stream ClientMessage) returns (stream ServerCommand) {}
+
+  rpc IpcEventReq(IpcEventRequest) returns (IpcEventAck);
+
+  rpc IpcInviteReq(IpcInviteRequest) returns (IpcInviteAck);
+}
+
+message ClientMessage {
+  oneof content {
+    ClientRegister register = 1;  // 客户端注册
+    CommandResult result = 2;     // 命令执行结果
+    Heartbeat heartbeat = 3;      // 心跳包
+  }
+}
+
+message ServerCommand {
+  int64 MsgID = 1;        // 命令唯一ID
+  string Method = 2;            // 执行动作
+  bytes payload = 3;            // 附加数据
+}
+
+message ClientRegister {
+  string client_id = 1;         // 客户端唯一标识
+  string version = 2;           // 客户端版本
+}
+
+message CommandResult {
+  int64 MsgID = 1;
+  bool success = 2;
+  bytes payload = 3;            
+}
+
+message Heartbeat {
+  int64 timestamp = 1;
+}
+
+message IpcEventRequest {
+  string client_id = 1;         // 客户端唯一标识
+  string ipc_id = 2;    // IPC MsgID
+  string event = 3;
+}
+
+message IpcEventAck {
+  bool success = 1;          // 处理结果是否成功
+  string msg = 2;        // 服务端的反馈信息
+}
+
+
+message IpcInviteRequest {
+  string client_id = 1;         
+  string ipc_id = 2;    
+}
+
+message IpcInviteAck {
+  bool success = 1;          
+  string zlm_ip = 2;
+  int64 zlm_port = 3;        
+}

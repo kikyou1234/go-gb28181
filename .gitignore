@@ -1,0 +1,16 @@
+.vscode/*
+srv
+.idea
+gosip
+vendor/*
+*.log
+ipc.db
+__debug_bin*
+*.yml
+*.db
+*.mod
+*.sum
+.DS_Store
+sip-server
+sip-client
+sip-gateway
