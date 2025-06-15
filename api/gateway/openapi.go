@@ -266,13 +266,42 @@ func RegisterSipServer(c *gin.Context) {
 
 	redis.HSet(c.Copy(), redis.SIPSERVER_Node, t.ServerID, url)
 
+	sip_url := fmt.Sprintf("%s:%s", t.SipIP, t.SipPort)
+
+	redis.HSet(c.Copy(), redis.SIPSERVER_IPC_Node, t.ServerID, sip_url)
+
 	c.JSON(http.StatusOK, map[string]any{
 		"code": 0,
 		"msg":  "success",
 	})
 }
 
+// 未 sip-client 分配一个 sip-server
 func GetSipServer(c *gin.Context) {
+
+	sip_server_map, err := redis.HGetAll(c.Copy(), redis.SIPSERVER_IPC_Node)
+	if err != nil {
+		c.JSON(http.StatusOK, map[string]any{
+			"code": -1,
+			"msg":  "not found sip server",
+		})
+		return
+	}
+
+	_, sip_server_url, err := utils.SelectRandomMapValue(sip_server_map)
+	if err != nil {
+		c.JSON(http.StatusOK, map[string]any{
+			"code": -1,
+			"msg":  "not found sip server",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]any{
+		"code": 0,
+		"msg":  "success",
+		"data": sip_server_url,
+	})
 
 }
 

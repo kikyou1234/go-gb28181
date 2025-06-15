@@ -1,19 +1,51 @@
 package main
 
 import (
-	capi "go-sip/api/c"
-	. "go-sip/common"
+	"encoding/json"
+	"fmt"
 	grpc_client "go-sip/grpc_api/c"
 	"go-sip/logger"
 	. "go-sip/logger"
 	"go-sip/m"
 	sipapi "go-sip/sip"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
+
+type SipServerResponse struct {
+	Code int    `json:"code"`
+	Msg  string `json:"msg"`
+	Data string `json:"data"`
+}
+
+func GetSipServer() (string, error) {
+	url := fmt.Sprintf("http://%s/open/server/getone", m.CMConfig.Gateway) // 替换为你的实际接口地址
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	// 读取响应体
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	// 解析 JSON
+	var result SipServerResponse
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return "", err
+	}
+
+	return result.Data, nil
+}
 
 func main() {
 
@@ -24,35 +56,19 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	r := gin.Default()
-
-	r.POST(ZLMWebHookClientURL, capi.ZLMWebHook)
 
 	client := grpc_client.NewSipClient(device_id)
 	sipapi.Start()
 
-	// 启动 API 服务，放到 goroutine 中
-	go func() {
-		for {
-			err := r.Run(m.CMConfig.API)
-			if err != nil {
-				Logger.Error("api服务启动失败", zap.Error(err))
-				time.Sleep(5 * time.Second)
-				continue
-			}
-			Logger.Warn("api服务退出，尝试重新启动...")
-			time.Sleep(5 * time.Second)
-		}
-	}()
-
 	for {
-		tcp_addr := ""
-		if tcp_addr == "" {
-			// 默认获取配置中的tcp地址
-			tcp_addr = m.CMConfig.TCP
+		tcp_addr, err := GetSipServer()
+		if err != nil {
+			Logger.Error("连接sip-gateway失败", zap.Error(err))
+			time.Sleep(5 * time.Second)
+			continue
 		}
 		if err := client.Connect(tcp_addr); err != nil {
-			Logger.Error("连接失败", zap.Error(err))
+			Logger.Error("连接sip-server失败", zap.Error(err))
 			time.Sleep(5 * time.Second)
 			continue
 		}

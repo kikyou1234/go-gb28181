@@ -501,9 +501,7 @@ func zlmStreamNoneReader(c *gin.Context) {
 
 		s_size := strings.Split(req.Stream, "_")
 
-		if len(s_size) == 3 {
-			req.Stream = s_size[0]
-		}
+		ipc_id := s_size[0]
 
 		sip_server := grpc_server.GetSipServer()
 		sip_req := &grpc_api.Sip_Stop_Play_Req{
@@ -513,7 +511,7 @@ func zlmStreamNoneReader(c *gin.Context) {
 		if err != nil {
 			m.ZlmWebHookResponse(c, -1, "参数格式错误，json序列化失败")
 		}
-		device_id, err := redis.HGet(c.Copy(), redis.IPC_DEVICE, req.Stream)
+		device_id, err := redis.HGet(c.Copy(), redis.IPC_DEVICE, ipc_id)
 		if err != nil {
 			m.ZlmWebHookResponse(c, -1, "ipc_id未注册，请检查摄像头是否正常")
 		}

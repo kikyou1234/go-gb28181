@@ -6,30 +6,15 @@ import (
 
 	db "go-sip/db/sqlite"
 
-	"fmt"
-
 	"github.com/spf13/viper"
 )
 
 // Config Config
 type C_Config struct {
-	API           string       `json:"api" yaml:"api" mapstructure:"api"`
-	SipClientPort string       `json:"sip_client_port" yaml:"sip_client_port" mapstructure:"sip_client_port"`
-	UDP           string       `json:"udp" yaml:"udp" mapstructure:"udp"`
-	TCP           string       `json:"tcp" yaml:"tcp" mapstructure:"tcp"`
-	Gateway       string       `json:"gateway" yaml:"gateway" mapstructure:"gateway"`
-	ZlmSecret     string       `json:"zlm_secret" yaml:"zlm_secret" mapstructure:"zlm_secret"`
-	ZlmInnerIp    string       `json:"zlm_inner_ip" yaml:"zlm_inner_ip" mapstructure:"zlm_inner_ip"`
-	LogLevel      string       `json:"logger" yaml:"logger" mapstructure:"logger"`
-	Stream        *Stream      `json:"stream" yaml:"stream" mapstructure:"stream"`
-	GB28181       *SysInfo     `json:"gb28181" yaml:"gb28181" mapstructure:"gb28181"`
-	Audio         *AudioConfig `json:"audio" yaml:"audio" mapstructure:"audio"`
-}
-
-// Stream Stream
-type Stream struct {
-	HLS  bool `json:"hls" yaml:"hls" mapstructure:"hls"`
-	RTMP bool `json:"rtmp" yaml:"rtmp" mapstructure:"rtmp"`
+	UDP      string   `json:"udp" yaml:"udp" mapstructure:"udp"`
+	Gateway  string   `json:"gateway" yaml:"gateway" mapstructure:"gateway"`
+	LogLevel string   `json:"logger" yaml:"logger" mapstructure:"logger"`
+	GB28181  *SysInfo `json:"gb28181" yaml:"gb28181" mapstructure:"gb28181"`
 }
 
 type SysInfo struct {
@@ -39,13 +24,6 @@ type SysInfo struct {
 	LID string `json:"lid" bson:"lid" yaml:"lid" mapstructure:"lid"`
 	// 密码
 	Passwd string `json:"passwd" bson:"passwd" yaml:"passwd" mapstructure:"passwd"`
-}
-
-type AudioConfig struct {
-	SampleRate   float64 `json:"sample_rate" yaml:"sample_rate" mapstructure:"sample_rate"`
-	Channels     int     `json:"channels" yaml:"channels" mapstructure:"channels"`
-	InputDevice  int     `json:"input_device" yaml:"input_device" mapstructure:"input_device"`
-	OutputDevice int     `json:"output_device" yaml:"output_device" mapstructure:"output_device"`
 }
 
 func DefaultInfo() *SysInfo {
@@ -81,11 +59,5 @@ func LoadClientConfig() {
 	})
 	db.DBClient.LogMode(false)
 	go db.KeepLive(db.DBClient, time.Minute)
-
-	// 自动设置 API 为 0.0.0.0:<sip_port>（如果未设置）
-	api := strings.TrimSpace(CMConfig.API)
-	if api == "" || api == "0.0.0.0" || api == "0.0.0.0:" {
-		CMConfig.API = fmt.Sprintf("0.0.0.0:%s", CMConfig.SipClientPort)
-	}
 
 }

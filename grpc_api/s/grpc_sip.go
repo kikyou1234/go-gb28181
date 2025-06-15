@@ -130,10 +130,8 @@ func (s *SipServer) IpcEventReq(ctx context.Context, req *pb.IpcEventRequest) (*
 		Logger.Info("添加新的摄像头 ", zap.Any("device_id", req.ClientId), zap.Any("ipc_id", req.IpcId))
 	case sipapi.NotifyMethodChannelsActive:
 		Logger.Info("收到通道活跃通知 ", zap.Any("device_id", req.ClientId), zap.Any("channel_id", req.IpcId))
-		redis.HSet(ctx, redis.SIPSERVER_IPC, m.SMConfig.SipID, req.IpcId) // sip-server  ->  ipc_id  记录这个服务连接多少个摄像头
-		redis.HSet(ctx, redis.IPC_SIPSERVER, req.IpcId, m.SMConfig.SipID) // ipc_id -> sip-server 记录 这个摄像头在 哪个设备
-		redis.HSet(ctx, redis.DEVICE_IPC, req.ClientId, req.IpcId)        // client_id -> ipc_id
-		redis.HSet(ctx, redis.IPC_DEVICE, req.IpcId, req.ClientId)
+		redis.HSet(ctx, redis.IPC_SIPSERVER, req.IpcId, m.SMConfig.SipID) // ipc_id -> sip-server 记录 这个摄像头在 哪个sip-server
+		redis.HSet(ctx, redis.IPC_DEVICE, req.IpcId, req.ClientId)        //  ipc-id -> client_id 记录 这个摄像头在哪个 客户端
 
 	}
 	return &pb.IpcEventAck{Success: true, Msg: "success"}, nil

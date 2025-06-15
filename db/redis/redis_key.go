@@ -7,6 +7,7 @@ var (
 	DEVICE_IPC       = "device_ipc"
 	IPC_DEVICE       = "ipc_device"
 
-	ZLM_Node       = "zlm_node"        // 存放zlm 信息
-	SIPSERVER_Node = "sip_server_node" // 存放 sip-server信息
+	ZLM_Node           = "zlm_node"        // 存放zlm 信息
+	SIPSERVER_Node     = "sip_server_node" // 存放 sip-server信息
+	SIPSERVER_IPC_Node = "sip_server_ipc_node"
 )

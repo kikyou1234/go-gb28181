@@ -65,6 +65,7 @@ func GatewayApiInit(r *gin.Engine) {
 		r.POST("/open/zlm/webhook/:method", gapi.ZLMWebHook)
 
 		r.POST("/open/server/register", gapi.RegisterSipServer)
+		r.GET("/open/server/getone", gapi.GetSipServer)
 
 	}
 }

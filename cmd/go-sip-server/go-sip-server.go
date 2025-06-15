@@ -32,6 +32,8 @@ func RegisterGateway() error {
 		ServerID: m.SMConfig.SipID,
 		IP:       m.SMConfig.Api.IP,
 		Port:     m.SMConfig.Api.Port,
+		SipIP:    m.SMConfig.Sip.SipIP,
+		SipPort:  m.SMConfig.Sip.SipPort,
 	}
 
 	data := utils.JSONEncode(t)
